@@ -1,0 +1,38 @@
+给定一个字符串 abcdabgh，给个字符 a，随机返回 a 下标，比如这个是 0 4。要求返回的概率必须一样，空间复杂度要求 O（1） 即不能开任何空间存储下标，并且只能遍历一次。
+
+给定字符串和字符，随机返回字符出现的下标，要求每次返回的概率相等，并且空间复杂度为O(1)，可以通过reservoir sampling（水塘抽样）算法来实现。水塘抽样是一种随机算法，适用于从一个含有未知大小的集合中选取k个样本，同时保证每个样本被选中的概率都是相同的。
+
+这是一个水塘抽样算法的简化版本，它针对的是k=1的情况，即从未知大小的集合中随机选择一个元素。具体实现如下：
+
+import java.util.Random;
+
+public class ReservoirSampling {
+    public static int getRandomIndex(String str, char ch) {
+        int selectedIndex = -1; // 保存选中字符的下标，初始设为-1表示还未找到
+        int count = 0; // 计数器，记录目标字符出现的次数
+        Random rand = new Random();
+
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == ch) {
+                count++; // 遇到目标字符，计数器加1
+                // 产生一个[0, count)内的随机整数，如果它等于0，我们就选择当前遍历到的字符
+                if (rand.nextInt(count) == 0) {
+                    selectedIndex = i;
+                }
+            }
+        }
+
+        return selectedIndex;
+    }
+
+    public static void main(String[] args) {
+        String str = "abcdabgh";
+        char ch = 'a';
+        int index = getRandomIndex(str, ch);
+        System.out.println("Random Index: " + index);
+    }
+}
+
+在这个算法中，我们遍历给定的字符串，每次遇到目标字符，就通过生成一个随机数的方式来决定是否选择当前字符的下标作为结果（对应的下标将是被返回的随机下标）。这里的random.nextInt(count)将生成一个位于[0, count)区间的随机整数，其中count是到目前为止遇到的目标字符的数量。所以第一个找到的目标字符有100%的概率选中，第二个有50%的概率替换第一个被选中，依此类推。这确保了每个目标字符被选中的概率是相同的。
+
+https://huangjj27.gitlab.io/reservoirsampling/
